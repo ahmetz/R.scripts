@@ -1,16 +1,9 @@
-
-rpkm.heatmap <- function(dataframe, title){
+rpkm.heatmap <- function(dataframe, title, ...){
   require("RColorBrewer")
-  dmatrix <- data.matrix(dataframe[2:length(dataframe)])
-  dmatrix <- apply(dmatrix, 2, function(x) log2(x+1))
-  row.names(dmatrix) <- dataframe$gene
+  dmatrix <- as.matrix(log2(dataframe + 1))
   hr <- hclust(as.dist(1-cor(t(dmatrix), method="pearson")), method="complete")
   hc <- hclust(as.dist(1-cor(dmatrix, method="spearman")), method="complete")
-  y<-dmatrix
-  nf <- layout
-  heatmap(dmatrix, Rowv=as.dendrogram(hr), Colv=as.dendrogram(hc), scale = "none", col= brewer.pal(9, "Blues"), main=title, margins = c(10,10))
-
-  heatmap(matrix(rep(seq(min(as.vector(y)), max(as.vector(y)), length.out=10),2), 2, byrow=T, dimnames=list(1:2, round(seq(min(as.vector(y)), max(as.vector(y)), length.out=10),1))), col=brewer.pal(9, "Blues"), Colv=NA, Rowv=NA, labRow="", main=title)
+  heatmap.2(dmatrix)
 }
 getRPKMdata <- function(geneList){
   connection <- dbConnect(SQLite(), "~/sqlDatabase/geneExpression.db") #get connected to the SQL database
