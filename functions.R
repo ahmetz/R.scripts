@@ -1,9 +1,14 @@
-rpkm.heatmap <- function(dataframe, title, ...){
+rpkm.heatmap2 <- function(dataframe, title, defaultCluster = TRUE, ...){ # Function to generate heatmaps from dataframes and/or matrix
   require("RColorBrewer")
   dmatrix <- as.matrix(log2(dataframe + 1))
-  hr <- hclust(as.dist(1-cor(t(dmatrix), method="pearson")), method="complete")
-  hc <- hclust(as.dist(1-cor(dmatrix, method="spearman")), method="complete")
-  heatmap.2(dmatrix)
+  myPalette <- colorRampPalette(rev(brewer.pal(11, "Spectral")))
+  if(!defaultCluster){
+    hr <- hclust(as.dist(1-cor(t(dmatrix), method="pearson")), method="complete")
+    hc <- hclust(as.dist(1-cor(dmatrix, method="spearman")), method="complete")
+    heatmap.2(dmatrix, Rowv=as.dendrogram(hr), Colv=as.dendrogram(hc), col=myPalette(100), scale="row", density.info="none", trace="none", keysize = 1, main = title, labCol=gsub("[.][0-9]{1,3}", "", colnames(dataframe)), ...)
+  } else {
+    heatmap.2(dmatrix, col=myPalette(100), scale="row", density.info="none", trace="none", keysize = 1, main = title, labCol=gsub("[.][0-9]{1,3}", "", colnames(dataframe)), ...)
+  }
 }
 getRPKMdata <- function(geneList){
   connection <- dbConnect(SQLite(), "~/sqlDatabase/geneExpression.db") #get connected to the SQL database
